@@ -1,2 +1,6 @@
 # MP3 test files
 *.mp3
+
+# Ignore pycache
+*.pyc
+__pycache__/
