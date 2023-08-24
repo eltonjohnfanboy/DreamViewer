@@ -11,17 +11,17 @@ class DreamViewer:
 
     def __init__(self, config):
         self.config = config
-        self.audio_text_converter = pipeline(model = config.speech_to_text)
-        self.audio_text_converter.to("cuda")
-        self.image_generator = DiffusionPipeline.from_pretrained(config.text_to_image)
+        #self.audio_text_converter = pipeline(model = config.speech_to_text)
+        #self.image_generator = DiffusionPipeline.from_pretrained(config.text_to_image)
         self.image_generator = DiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
-        self.image_generator.to("cuda")
-        self.text_generator = pipeline('text-generation', model = config.text_generator)
-        self.output_filename = os.join(config.output_dir, config.story_name + ".mp4")
+        #self.image_generator.to("cuda")
+        #self.text_generator = pipeline('text-generation', model = config.text_generator)
+        self.output_filename = os.path.join(config.output_dir, config.story_name + ".mp4")
         self.fps = config.fps
+        self.text_cont = False
     
     def get_text(self):
-        return str("Once upon a time there was a kid. Countinue the story.")
+        return str("Once upon a time the earth was inhabited by giants.")
         #return self.audio_text_converter(self.config.audio_file)['text']
 
     def get_image(self, text):
@@ -40,6 +40,7 @@ class DreamViewer:
 
         # If the users asks us to countinue the story we use the text-generation model to do so
         if re.sub(r'[^\w\s]', '', dreams[-1]).lower() == 'countinue the story':
+            self.text_cont = True
             pattern = r'\s*([Cc]ountinue\s+the\s+story\s*\.)$'
             cleaned_string = re.sub(pattern, '', audio_text)
             expanded_dreams = self.generate_text(cleaned_string)
@@ -58,8 +59,10 @@ class DreamViewer:
             extended_images.append(image)
 
         # Save video
-        fps = 30
         imageio.mimsave(self.output_filename, extended_images, fps = self.fps)
+
+        # Return text completion if the user asked us to complete the story
+        return cleaned_string if self.text_cont else None
 
 
 

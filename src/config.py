@@ -20,6 +20,7 @@ class GenerationArgsDefault:
     OUTPUT_DIR: str = "./output_generation/Sad Dad"
     FPS: int = 30
     SEED: int =  17
+    AUDIO_DATA: str = "./test_data"
 
 
 @dataclass
@@ -36,7 +37,7 @@ class DreamViewerConfig:
     audio_file: str = GenerationArgsDefault.INIT_AUDIO_FILE
     story_name: str = GenerationArgsDefault.STORY_NAME
     output_dir: str = GenerationArgsDefault.OUTPUT_DIR
-    dps: int = GenerationArgsDefault.FPS
+    fps: int = GenerationArgsDefault.FPS
     seed: int = GenerationArgsDefault.SEED
 
 
