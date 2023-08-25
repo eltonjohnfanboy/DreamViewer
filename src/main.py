@@ -1,40 +1,11 @@
 import streamlit as st
+import os
+from audiorecorder import audiorecorder
+
 from config import GenerationArgsDefault, DreamViewerConfig
 from DreamViewer import DreamViewer
 from utils import set_seed
 
-import os
-import pyaudio
-import wave
-
-def record_audio(recording_time):
-    CHUNK = 1024
-    FORMAT = pyaudio.paInt16
-    CHANNELS = 1
-    RATE = 44100
-    
-    p = pyaudio.PyAudio()
-    
-    stream = p.open(format=FORMAT,
-                    channels=CHANNELS,
-                    rate=RATE,
-                    input=True,
-                    frames_per_buffer=CHUNK)
-    
-    frames = []
-    
-    st.warning("Recording audio...")
-    for _ in range(0, int(RATE / CHUNK * recording_time)):
-        data = stream.read(CHUNK)
-        frames.append(data)
-    
-    st.warning("Recording finished.")
-    
-    stream.stop_stream()
-    stream.close()
-    p.terminate()
-    
-    return b''.join(frames)
 
 def main():
     # Initial page configurations
@@ -65,13 +36,13 @@ def main():
             audio_uploaded = True
     elif option == "Record Audio":
         st.subheader("Record Audio")
-        recording_time = st.slider("Select recording time (seconds)", 1, 30, 5)
         st.write("Press the 'Record Audio' button below:")
-        record_audio_bt = st.button("Record Audio")
-        if record_audio_bt:
-            audio_file = record_audio(recording_time)
-            st.audio(audio_file, format='audio/mp3') 
-            audio_recorded = True
+        audio_file = audiorecorder("Click to record", "Recording...")
+        if len(audio_file) > 0:
+            # To play the audio:
+            st.audio(audio_file.tobytes())
+            #st.audio(audio_file, format='audio/mp3') 
+        audio_recorded = True
 
     # Story title
     st.subheader("Story Title")
@@ -92,7 +63,10 @@ def main():
                 os.makedirs(GenerationArgsDefault.AUDIO_DATA, exist_ok = True)
                 audio_path = os.path.join(GenerationArgsDefault.AUDIO_DATA, story_title+".mp3")
                 with open(audio_path, 'wb') as f:
-                    f.write(audio_file.getbuffer())
+                    if audio_uploaded:
+                        f.write(audio_file.getbuffer())
+                    else:
+                        f.write(audio_file.tobytes())
 
                 # Define arguments and set model configuration
                 args = {'audio_file': audio_path, 'story_name': story_title}
