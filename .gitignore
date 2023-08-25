@@ -4,3 +4,6 @@
 # Ignore pycache
 *.pyc
 __pycache__/
+
+# MP4 files generated
+*.mp4
