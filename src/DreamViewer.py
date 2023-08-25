@@ -1,6 +1,6 @@
 from transformers import pipeline
 from diffusers import DiffusionPipeline
-from PIL import Image
+from PIL import ImageDraw, ImageFont
 import os
 import imageio
 import re
@@ -11,18 +11,17 @@ class DreamViewer:
 
     def __init__(self, config):
         self.config = config
-        #self.audio_text_converter = pipeline(model = config.speech_to_text)
-        #self.image_generator = DiffusionPipeline.from_pretrained(config.text_to_image)
-        self.image_generator = DiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
-        #self.image_generator.to("cuda")
-        #self.text_generator = pipeline('text-generation', model = config.text_generator)
+        self.audio_text_converter = pipeline(model = config.speech_to_text)
+        self.image_generator = DiffusionPipeline.from_pretrained(config.text_to_image)
+        #self.image_generator = DiffusionPipeline.from_pretrained("runwayml/stable-diffusion-v1-5")
+        self.image_generator.to("cuda")
+        self.text_generator = pipeline('text-generation', model = config.text_generator)
         self.output_filename = os.path.join(config.output_dir, config.story_name + ".mp4")
         self.fps = config.fps
         self.text_cont = False
     
     def get_text(self):
-        return str("Once upon a time the earth was inhabited by giants.")
-        #return self.audio_text_converter(self.config.audio_file)['text']
+        return self.audio_text_converter(self.config.audio_file)['text']
 
     def get_image(self, text):
         return self.image_generator(text).images[0]
@@ -50,6 +49,17 @@ class DreamViewer:
         generated_images = []
         for d in dreams:
             d_image = self.get_image(d)
+
+            # Write subtitles
+            draw = ImageDraw.Draw(d_image)
+            font_size = 40
+            font = ImageFont.truetype('./utils/fonts/OpenSans-Semibold.ttf', size = font_size)
+            text_width, text_height = draw.textsize(d, font=font)
+            text_x = (d_image.size[0] - text_width) // 2
+            text_y = d_image.size[1] - text_height - 10
+            text_color = (255, 255, 255)
+            draw.text((text_x, text_y), d, font=font, fill=text_color)
+
             generated_images.append(d_image)
         
         # Replicate images for desired duration

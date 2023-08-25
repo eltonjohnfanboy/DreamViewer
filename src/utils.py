@@ -13,7 +13,7 @@ def set_seed(seed: int):
     torch.backends.cudnn.deterministic = True
     torch.backends.cudnn.benchmark = True
 
-
+# Function not used -> made for the initial CLI version of DreamViewer
 def get_args_cli():
     parser = ArgumentParser()
     parser.add_argument(
