@@ -3,10 +3,10 @@ from dataclasses import dataclass, field
 @dataclass(frozen = True)
 class ModelsConfig:
     SPEECH_TO_TEXT: str = "openai/whisper-small"
-    #TEXT_TO_IMAGE: str = "stabilityai/stable-diffusion-2" ass
-    #TEXT_TO_IMAGE: str = "CompVis/stable-diffusion-v1-4" no tant ass
+    #TEXT_TO_IMAGE: str = "stabilityai/stable-diffusion-2"
+    #TEXT_TO_IMAGE: str = "CompVis/stable-diffusion-v1-4"
     #TEXT_TO_IMAGE: str = "stabilityai/stable-diffusion-2-1"
-    #TEXT_TO_IMAGE: str = "dreamlike-art/dreamlike-photoreal-2.0" m'agrada
+    #TEXT_TO_IMAGE: str = "dreamlike-art/dreamlike-photoreal-2.0"
     TEXT_TO_IMAGE: str = "prompthero/openjourney"
     TEXT_GENERATOR: str = "gpt2"
     TEXT_TO_VIDEO: str = ""
